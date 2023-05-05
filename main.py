@@ -7,7 +7,6 @@ from fastapi.responses import HTMLResponse
 from fastapi import Query
 from fastapi.middleware.cors import CORSMiddleware
 
-
 from vo.customer_err import CustomError
 from vo.response import Response
 from consts.code_resp import Err_Question_Empty, Err_GameId_Empty, Err_System
@@ -18,7 +17,8 @@ app = FastAPI()
 # 允许跨域请求的来源
 origins = [
     "http://localhost",
-    "http://localhost:8080",
+    "http://43.156.32.180",
+    "http://customer-ai.hortorgames.com/",
 ]
 
 # 添加 CORS 中间件
@@ -29,7 +29,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 # 配置静态文件目录，这里将静态文件放在项目的 static 目录中
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -44,7 +43,7 @@ print("csv初始化完成")
 
 
 @app.get("/getAnswer")
-def get_answer(question:  str = Query(None)):
+def get_answer(question: str = Query(None)):
     if question is None:
         return Response.fail(Err_Question_Empty.code, Err_Question_Empty.message)
     try:
