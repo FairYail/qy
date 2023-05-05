@@ -7,8 +7,8 @@ def read_csv_file():
     :param file_path: CSV文件的路径
     :return: 包含所有数据的列表
     """
-    # with open("/home/dev/qy/util/dtl.csv", encoding="utf-8") as csv_file:
-    with open("/Users/zhuchen/Desktop/qy/util/dtl.csv", encoding="utf-8") as csv_file:
+    with open("/home/dev/qy/util/dtl.csv", encoding="utf-8") as csv_file:
+    # with open("/Users/zhuchen/Desktop/qy/util/dtl.csv", encoding="utf-8") as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         headers = next(csv_reader)
         data = []
