@@ -2,12 +2,12 @@ import threading
 
 from dto.question_dto import QuestionDto
 from model.question_model import QuestionMap
-from text2vec import SentenceModel, semantic_search, Word2Vec
+from text2vec import SentenceModel, semantic_search
 
 from util.csvUtil import read_csv_file
 
+embedder = SentenceModel("GanymedeNil/text2vec-large-chinese")
 # embedder = SentenceModel("shibing624/text2vec-base-chinese")
-embedder = Word2Vec("w2v-light-tencent-chinese")
 
 
 # 定义问题服务
