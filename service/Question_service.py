@@ -21,7 +21,6 @@ class QuestionService:
         # 数字混存问题信息
         self.cacheQuestion = {}
 
-
     # 初始化问题映射表
     def initialize_question_map(self):
         # 加载问题数据，初始化question_map
@@ -94,7 +93,11 @@ class QuestionService:
         lst = self.queryQuestion(gameId, query_question, num)
         # 结果处理
         if len(lst) == 0:
-            return "问题查找不存在，请输入重新提问题"
+            return "<div>问题查找不存在，请输入重新提问题</div>\n"
+
+        if lst[0].score < 0.6:
+            return "<div" \
+                   ">掌门您好，非常抱歉没有听懂您的意思，您可以输入【*】返回主菜单进行提问，如未能解决您的问题，请您输入“联系客服”，转人工咨询，详细描述下您遇到的问题并提供相应截图或视频，以便这边为您核实处理哦。</div>\n"
 
         answerStr = ""
         # 结果处理，匹配度达到1，直接返回问题信息，其他返回前5个问题
@@ -114,7 +117,12 @@ class QuestionService:
         else:
             answerStr = "<div>您是否想咨询以下问题</div>\n"
             answerStr += "<div>输入【*】返回主菜单，请回复相应数字</div>\n"
+
+            num = 1
             for i in range(len(lst)):
-                answerStr += "<div>" + str(i + 1) + "、" + lst[i].questionId + "【相似度：" + str(lst[i].score) + "】</div>\n"
-                self.cacheQuestion[str(i + 1)] = lst[i].questionId
+                if lst[i].score >= 0.6:
+                    answerStr += "<div>" + str(num) + "、" + lst[i].questionId + "【相似度：" + str(
+                        lst[i].score) + "】</div>\n"
+                    self.cacheQuestion[str(num)] = lst[i].questionId
+                    num += 1
         return answerStr
