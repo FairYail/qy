@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 from fastapi import FastAPI, Request
 import requests
 
@@ -12,9 +13,11 @@ app = FastAPI()
 # 初始化问题映射表
 question_service = QuestionService()
 question_service.initialize_question_map()
-
+print("csv初始化完成")
 
 # 初始化向量
+
+
 @app.get("/getAnswer/{gameId}}")
 def get_answer(gameId: str, question: str = None):
     if question is None:

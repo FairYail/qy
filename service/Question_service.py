@@ -38,7 +38,7 @@ class QuestionService:
                 if aInfo != "" and qInfo not in infoQM:
                     infoQM[qInfo] = aInfo
 
-                if infoRM[qInfo] is None:
+                if qInfo not in infoRM:
                     infoRM[qInfo] = []
 
                 if rInfo != "" and rInfo not in infoRM[qInfo]:
@@ -51,8 +51,7 @@ class QuestionService:
             self.question_map["dtl"] = question_map
 
             # 向量初始化
-            self.initialize_gameId_embeddings(question_list)
-            pass
+            # self.initialize_gameId_embeddings(question_list)
 
     # 向量初始化
     def initialize_gameId_embeddings(self, question_list):
