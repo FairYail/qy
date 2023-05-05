@@ -6,7 +6,8 @@ from text2vec import SentenceModel, semantic_search
 
 from util.csvUtil import read_csv_file
 
-embedder = SentenceModel("shibing624/text2vec-base-chinese")
+# embedder = SentenceModel("shibing624/text2vec-base-chinese")
+embedder = SentenceModel("w2v-light-tencent-chinese")
 
 
 # 定义问题服务
