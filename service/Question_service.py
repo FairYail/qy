@@ -7,6 +7,8 @@ from text2vec import SentenceModel, semantic_search
 from util.csvUtil import read_csv_file
 
 embedder = SentenceModel("GanymedeNil/text2vec-large-chinese")
+
+
 # embedder = SentenceModel("shibing624/text2vec-base-chinese")
 
 
@@ -96,10 +98,6 @@ class QuestionService:
         if len(lst) == 0:
             return "<div>问题查找不存在，请输入重新提问题</div>\n"
 
-        if lst[0].score < 0.2:
-            return "<div" \
-                   ">掌门您好，非常抱歉没有听懂您的意思，您可以输入【*】返回主菜单进行提问，如未能解决您的问题，请您输入“联系客服”，转人工咨询，详细描述下您遇到的问题并提供相应截图或视频，以便这边为您核实处理哦。</div>\n"
-
         answerStr = ""
         # 结果处理，匹配度达到1，直接返回问题信息，其他返回前5个问题
         if lst[0].score == 1:
@@ -115,15 +113,19 @@ class QuestionService:
                 self.cacheQuestion[str(num)] = question
                 num += 1
 
-        else:
+        elif lst[0].score >= 0.5:
             answerStr = "<div>您是否想咨询以下问题</div>\n"
             answerStr += "<div>输入【*】返回主菜单，请回复相应数字</div>\n"
 
             num = 1
             for i in range(len(lst)):
-                if lst[i].score >= 0.4:
+                if lst[i].score >= 0.5:
                     answerStr += "<div>" + str(num) + "、" + lst[i].questionId + "【相似度：" + str(
                         lst[i].score) + "】</div>\n"
                     self.cacheQuestion[str(num)] = lst[i].questionId
                     num += 1
+        else:
+            return "<div" \
+                   ">掌门您好，非常抱歉没有听懂您的意思，您可以输入【*】返回主菜单进行提问，如未能解决您的问题，请您输入“联系客服”，转人工咨询，详细描述下您遇到的问题并提供相应截图或视频，以便这边为您核实处理哦。</div>\n"
+
         return answerStr
