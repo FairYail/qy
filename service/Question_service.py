@@ -13,6 +13,7 @@ embedder = SentenceModel("GanymedeNil/text2vec-large-chinese")
 class QuestionService:
     def __init__(self):
         self.question_map = {}  # 问题映射表
+        self.question_list = {}  # 问题映射表
         self.gameId_embeddings = {}  # gameId对应的embeddings
         self.question_lock = threading.Lock()
         self.game_lock = threading.Lock()
@@ -49,9 +50,10 @@ class QuestionService:
             for val in infoQM:
                 question_map.update(val, infoQM[val], infoRM[val])
             self.question_map["dtl"] = question_map
+            self.question_list["dtl"] = question_list
 
             # 向量初始化
-            # self.initialize_gameId_embeddings(question_list)
+            self.initialize_gameId_embeddings(question_list)
 
     # 向量初始化
     def initialize_gameId_embeddings(self, question_list):
@@ -71,7 +73,7 @@ class QuestionService:
             hits = semantic_search(query_embedding, corpus_embeddings, top_k=num)
             hits = hits[0]
             for hit in hits:
-                questionName = hit['corpus_id']
+                questionName = self.question_list['dtl'][hit['corpus_id']]
                 score = hit['score']
                 dto = QuestionDto(questionName, score)
                 lst.append(dto)
@@ -92,4 +94,9 @@ class QuestionService:
             answerStr = answerModelInfo.get_answer() + "\n"
             for question in answerModelInfo.get_relation_question_list():
                 answerStr += "1、" + question + "\n"
+
+        else:
+            answerStr = "您是否想咨询以下问题\n"
+            for i in range(len(lst)):
+                answerStr += str(i + 1) + "、" + lst[i].questionId + ",相似度：" + str(lst[i].score) + "\n"
         return answerStr

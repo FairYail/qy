@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 from fastapi import FastAPI, Request
-import requests
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
+from fastapi import Query
 
 from vo.customer_err import CustomError
 from vo.response import Response
@@ -10,22 +13,24 @@ from service.Question_service import QuestionService
 
 app = FastAPI()
 
+# 配置静态文件目录，这里将静态文件放在项目的 static 目录中
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# 配置模板引擎，这里使用 Jinja2
+templates = Jinja2Templates(directory="templates")
+
 # 初始化问题映射表
 question_service = QuestionService()
 question_service.initialize_question_map()
 print("csv初始化完成")
 
-# 初始化向量
 
-
-@app.get("/getAnswer/{gameId}}")
-def get_answer(gameId: str, question: str = None):
+@app.get("/getAnswer")
+def get_answer(question:  str = Query(None)):
     if question is None:
         return Response.fail(Err_Question_Empty.code, Err_Question_Empty.message)
-    if gameId is None:
-        return Response.fail(Err_GameId_Empty.code, Err_GameId_Empty.message)
     try:
-        lst = question_service.doQuestion(gameId, question, 10)
+        lst = question_service.doQuestion("dtl", question, 10)
         return Response.success(lst)
     except CustomError as e:
         return Response.fail(e.code, e.message)
@@ -33,30 +38,7 @@ def get_answer(gameId: str, question: str = None):
         return Response.fail(Err_System.code, str(e))
 
 
-@app.get("/")
-def index(request: Request):
-    html = """
-        <html>
-            <body>
-                <form method="get">
-                    <label for="value">Enter a value:</label>
-                    <input type="text" name="value" id="value">
-                    <button type="submit" name="submit">Get Data</button>
-                </form>
-                <div>
-                    %s
-                </div>
-            </body>
-        </html>
-    """
-    response_data = ""
-    if "value" in request.query_params:
-        value = request.query_params["value"]
-        response = requests.get(f"https://localhost:80/getAnswer/{value}?gameId=dtl")
-        json_data = response.json()
-        if "meta" in json_data and "errCode" in json_data["meta"]:
-            if json_data["meta"]["errCode"] == 0:
-                response_data = json_data["data"]
-            else:
-                response_data = json_data["meta"]["errMsg"]
-    return html % response_data
+# 路由：渲染首页
+@app.get("/", response_class=HTMLResponse)
+async def index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
