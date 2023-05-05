@@ -120,7 +120,7 @@ class QuestionService:
 
             num = 1
             for i in range(len(lst)):
-                if lst[i].score >= 0.6:
+                if lst[i].score >= 0.4:
                     answerStr += "<div>" + str(num) + "、" + lst[i].questionId + "【相似度：" + str(
                         lst[i].score) + "】</div>\n"
                     self.cacheQuestion[str(num)] = lst[i].questionId
