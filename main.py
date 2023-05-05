@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import uvicorn
+
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -59,3 +61,7 @@ def get_answer(question: str = Query(None)):
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+
+if __name__ == '__main__':
+    uvicorn.run(app=app, host="0.0.0.0", port=80, reload=True)
