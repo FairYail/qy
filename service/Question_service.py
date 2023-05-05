@@ -18,6 +18,10 @@ class QuestionService:
         self.question_lock = threading.Lock()
         self.game_lock = threading.Lock()
 
+        # 数字混存问题信息
+        self.cacheQuestion = {}
+
+
     # 初始化问题映射表
     def initialize_question_map(self):
         # 加载问题数据，初始化question_map
@@ -81,6 +85,11 @@ class QuestionService:
 
     # doQuestion 问题结果处理
     def doQuestion(self, gameId, query_question, num):
+        # 缓存查找，并且清空缓存
+        if query_question in self.cacheQuestion:
+            query_question = self.cacheQuestion[query_question]
+        self.cacheQuestion.clear()
+
         # 问题查询
         lst = self.queryQuestion(gameId, query_question, num)
         # 结果处理
@@ -91,12 +100,21 @@ class QuestionService:
         # 结果处理，匹配度达到1，直接返回问题信息，其他返回前5个问题
         if lst[0].score == 1:
             answerModelInfo = self.question_map[gameId].get(lst[0].questionId)
-            answerStr = answerModelInfo.get_answer() + "\n"
+            answerStr = "<div>" + answerModelInfo.get_answer() + "</div>\n"
+
+            if len(answerModelInfo.get_relation_question_list()) > 0:
+                answerStr += "<div>更多相关问题，请回复相应数字：</div>\n"
+
+            num = 1
             for question in answerModelInfo.get_relation_question_list():
-                answerStr += "1、" + question + "\n"
+                answerStr += "<div>" + str(num) + "、" + question + "</div>\n"
+                self.cacheQuestion[str(num)] = question
+                num += 1
 
         else:
-            answerStr = "您是否想咨询以下问题\n"
+            answerStr = "<div>您是否想咨询以下问题</div>\n"
+            answerStr += "<div>输入【*】返回主菜单，请回复相应数字</div>\n"
             for i in range(len(lst)):
-                answerStr += str(i + 1) + "、" + lst[i].questionId + ",相似度：" + str(lst[i].score) + "\n"
+                answerStr += "<div>" + str(i + 1) + "、" + lst[i].questionId + "【相似度：" + str(lst[i].score) + "】</div>\n"
+                self.cacheQuestion[str(i + 1)] = lst[i].questionId
         return answerStr

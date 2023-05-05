@@ -5,6 +5,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi import Query
+from fastapi.middleware.cors import CORSMiddleware
+
 
 from vo.customer_err import CustomError
 from vo.response import Response
@@ -12,6 +14,22 @@ from consts.code_resp import Err_Question_Empty, Err_GameId_Empty, Err_System
 from service.Question_service import QuestionService
 
 app = FastAPI()
+
+# 允许跨域请求的来源
+origins = [
+    "http://localhost",
+    "http://localhost:8080",
+]
+
+# 添加 CORS 中间件
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 # 配置静态文件目录，这里将静态文件放在项目的 static 目录中
 app.mount("/static", StaticFiles(directory="static"), name="static")

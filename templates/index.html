@@ -1,15 +1,36 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>FastAPI HTML</title>
-</head>
-<body>
-  <form action="/getAnswer" method="get">
-    <input type="text" name="question">
-    <button type="submit">提交</button>
-  </form>
-  {% if question %}
-  <div>您输入的问题是：{{ question }}</div>
-  {% endif %}
-</body>
+  <head>
+    <meta charset="UTF-8">
+    <title>Example Page</title>
+  </head>
+  <body>
+    <input type="text" id="input" placeholder="请输入内容">
+    <button id="submitBtn">提交</button>
+    <div id="output"></div>
+    <br>
+
+    <script>
+      const submitBtn = document.querySelector("#submitBtn");
+      const output = document.querySelector("#output");
+
+      submitBtn.addEventListener("click", () => {
+        const input = document.querySelector("#input").value;
+            console.log(input)
+        const url = `./getAnswer?question=${input}`;
+
+        fetch(url)
+          .then(response => response.json())
+          .then(data => {
+            console.log(data)
+            if (data.meta.errCode === 0) {
+              output.innerHTML = data.data.replace(/\n/g, "<br>");
+            } else {
+              output.innerHTML = data.errMsg.replace(/\n/g, "<br>");
+            }
+          })
+          .catch(error => console.error(error));
+      });
+    </script>
+  </body>
 </html>

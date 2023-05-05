@@ -1,49 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>FastAPI HTML</title>
-  <style>
-    #answer-container {
-      position: absolute;
-      top: 40px;
-      left: 0;
-      right: 0;
-      margin: auto;
-      width: 80%;
-      padding: 20px;
-      border: 1px solid #ccc;
-      background-color: #f5f5f5;
-      text-align: center;
-      display: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Example Page</title>
 </head>
 <body>
-  <form id="question-form">
-    <input type="text" id="question-input" name="question">
-    <button type="submit" id="submit-btn">提交</button>
-  </form>
-  <div id="answer-container"></div>
-  <script>
-    const form = document.querySelector('#question-form');
-    const input = document.querySelector('#question-input');
-    const container = document.querySelector('#answer-container');
-    const submitBtn = document.querySelector('#submit-btn');
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      container.innerHTML = '';
-      submitBtn.disabled = true;
-      var response = await fetch(`/getAnswer?question=${encodeURIComponent(input.value)}`);
-      var data = await response.json();
-      submitBtn.disabled = false;
-      if (data.meta.errCode === 0) {
-        container.innerHTML = `您输入的问题是：<b>${input.value}</b><br>回答：<b>${data.data}</b>`;
-        container.style.display = 'block';
-      } else {
-        container.innerHTML = `您输入的问题是：<b>${input.value}</b><br>错误信息：<b>${data.meta.errMsg}</b>`;
-        container.style.display = 'block';
-      }
+<input type="text" id="input" placeholder="请输入内容">
+<button id="submitBtn">提交</button>
+<div id="output"></div>
+
+<script>
+    const submitBtn = document.querySelector("#submitBtn");
+    const output = document.querySelector("#output");
+
+    submitBtn.addEventListener("click", () => {
+        const input = document.querySelector("#input").value;
+        console.log(input)
+        const url = `./getAnswer?question=${input}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data)
+                if (data.meta.errCode === 0) {
+                    output.innerHTML = data.data;
+                } else {
+                    output.innerHTML = data.errMsg;
+                }
+            })
+            .catch(error => console.error(error));
     });
-  </script>
+</script>
 </body>
 </html>
