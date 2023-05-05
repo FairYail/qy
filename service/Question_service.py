@@ -95,7 +95,7 @@ class QuestionService:
         if len(lst) == 0:
             return "<div>问题查找不存在，请输入重新提问题</div>\n"
 
-        if lst[0].score < 0.5:
+        if lst[0].score < 0.2:
             return "<div" \
                    ">掌门您好，非常抱歉没有听懂您的意思，您可以输入【*】返回主菜单进行提问，如未能解决您的问题，请您输入“联系客服”，转人工咨询，详细描述下您遇到的问题并提供相应截图或视频，以便这边为您核实处理哦。</div>\n"
 
@@ -120,7 +120,7 @@ class QuestionService:
 
             num = 1
             for i in range(len(lst)):
-                if lst[i].score >= 0.5:
+                # if lst[i].score >= 0.2:
                     answerStr += "<div>" + str(num) + "、" + lst[i].questionId + "【相似度：" + str(
                         lst[i].score) + "】</div>\n"
                     self.cacheQuestion[str(num)] = lst[i].questionId
