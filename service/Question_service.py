@@ -99,22 +99,41 @@ class QuestionService:
             return "<div>问题查找不存在，请输入重新提问题</div>\n"
 
         answerStr = ""
-        # 结果处理，匹配度达到1，直接返回问题信息，其他返回前5个问题
-        if lst[0].score == 1:
+        # 结果处理，匹配度达到0.85，返回问题信息及关联问题，并且返回前3个相似问题
+        if lst[0].score >= 0.85:
             answerModelInfo = self.question_map[gameId].get(lst[0].questionId)
             answerStr = "<div>" + answerModelInfo.get_answer() + "</div>\n"
 
             if len(answerModelInfo.get_relation_question_list()) > 0:
-                answerStr += "<div>更多相关问题，请回复相应数字：</div>\n"
+                answerStr += "<div style=\"color: #00ff00;\">更多关联问题，请回复相应数字：</div>\n"
 
+            conQuesList = []
             num = 1
             for question in answerModelInfo.get_relation_question_list():
                 answerStr += "<div>" + str(num) + "、" + question + "</div>\n"
                 self.cacheQuestion[str(num)] = question
+                conQuesList.append(question)
                 num += 1
 
+            # 取出第一个问题作为查到问题，再匹配前3个问题作为想死问题返回
+            arr = lst[1:4]
+
+            info = ""
+            for i in range(len(arr)):
+                ques = arr[i].questionId
+                if ques in conQuesList:
+                    continue
+                info += "<div>" + str(num) + "、" + ques + "【相似度：" + str(
+                    arr[i].score) + "】</div>\n"
+
+                self.cacheQuestion[str(num)] = ques
+                num += 1
+            if info != "":
+                answerStr += "<div style=\"color: #FFA500;\">更多想相似问题，请回复相应数字（相似度最高的的前三个）,输入【*】可以返回主菜单</div>\n"
+                answerStr += info
+
         elif lst[0].score >= 0.5:
-            answerStr = "<div>您是否想咨询以下问题</div>\n"
+            answerStr = "<div style=\"color: #FFA500;\">您是否想咨询以下相似问题</div>\n"
             answerStr += "<div>输入【*】返回主菜单，请回复相应数字</div>\n"
 
             num = 1
@@ -124,6 +143,7 @@ class QuestionService:
                         lst[i].score) + "】</div>\n"
                     self.cacheQuestion[str(num)] = lst[i].questionId
                     num += 1
+
         else:
             return "<div" \
                    ">掌门您好，非常抱歉没有听懂您的意思，您可以输入【*】返回主菜单进行提问，如未能解决您的问题，请您输入“联系客服”，转人工咨询，详细描述下您遇到的问题并提供相应截图或视频，以便这边为您核实处理哦。</div>\n"
