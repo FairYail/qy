@@ -128,9 +128,7 @@ class QuestionService:
 
                 self.cacheQuestion[str(num)] = ques
                 num += 1
-            if info != "":
-                answerStr += "<div style=\"color: #FFA500;\">更多想相似问题，请回复相应数字（相似度最高的的前三个）,输入【*】可以返回主菜单</div>\n"
-                answerStr += info
+            answerStr += info
 
         elif lst[0].score >= 0.5:
             answerStr = "<div style=\"color: #FFA500;\">您是否想咨询以下相似问题</div>\n"
